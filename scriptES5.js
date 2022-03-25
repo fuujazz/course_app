@@ -1,16 +1,16 @@
-class Course {
-  constructor(title, instructor, image) {
-    this.title = title;
-    this.instructor = instructor;
-    this.image = image;
-  }
+//  Course constructor
+function Course(_title, _instructor, _image) {
+  this.title = _title;
+  this.instructor = _instructor;
+  this.image = _image;
 }
 
-class UI {
-  addCourseToList(course) {
-    const list = document.getElementById("course-list");
+//  UI constructor
+function UI() {}
+UI.prototype.addCourseToList = function (course) {
+  const list = document.getElementById("course-list");
 
-    var html = `
+  var html = `
         <tr>
                 <th>Image</th>
                 <th>Title</th>
@@ -20,35 +20,33 @@ class UI {
                 </th>
               </tr>
     `;
-    list.innerHTML += html;
+  list.innerHTML += html;
+};
+UI.prototype.clearControls = function () {
+  const title = (document.getElementById("title").value = "");
+  const instructor = (document.getElementById("instructor").value = "");
+  const image = (document.getElementById("image").value = "");
+};
+UI.prototype.deleteCourse = function (element) {
+  console.log(element);
+  beforebegin;
+  if (element.classList.contains("delete")) {
+    element.parentElement.parentElement.remove();
   }
-
-  clearControls() {
-    const title = (document.getElementById("title").value = "");
-    const instructor = (document.getElementById("instructor").value = "");
-    const image = (document.getElementById("image").value = "");
-  }
-
-  deleteCourse(element) {
-    if (element.classList.contains("delete")) {
-      element.parentElement.parentElement.remove();
-    }
-  }
-
-  showAlert(message, className) {
-    var alert = `<div class="alert alert-${className}">
+};
+UI.prototype.showAlert = function (message, className) {
+  var alert = `<div class="alert alert-${className}">
   ${message}
   </div>`;
+  console.log(alert);
+  const row = document.querySelector(".row");
+  //  beforeBegin, afterBegin, beforeEnd, afterEnd
+  row.insertAdjacentHTML("beforebegin", alert);
 
-    const row = document.querySelector(".row");
-    //  beforeBegin, afterBegin, beforeEnd, afterEnd
-    row.insertAdjacentHTML("beforebegin", alert);
-
-    setTimeout(() => {
-      document.querySelector(".alert").remove();
-    }, 3000);
-  }
-}
+  setTimeout(() => {
+    document.querySelector(".alert").remove();
+  }, 3000);
+};
 
 document
   .getElementById("delete-all")
