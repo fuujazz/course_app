@@ -1,50 +1,95 @@
-// document
-//   .getElementById("new-course")
-//   .addEventListener("submit", function (event) {
-//     const title = document.getElementById("title").value;
-//     const instructor = document.getElementById("instructor").value;
-//     const image = document.getElementById("image").value;
-
-//     console.log(title, instructor, image);
-//     console.log("hebele hübele");
-//     event.preventDefault();
-//   });
-
-const save = document.querySelector(".btn");
-const course_list = document.getElementById("course-list");
-const from_group = document.querySelectorAll(".from-group");
-const courseList = [];
 class Course {
-  constructor(_title, _instructor, _image) {
-    this.title = _title;
-    this.instructor = _instructor;
-    this.image = _image;
+  constructor(title, instructor, image) {
+    this.title = title;
+    this.instructor = instructor;
+    this.image = image;
   }
 }
 
-save.addEventListener("click", (event) => {
-  const title = document.getElementById("title").value;
-  const instructor = document.getElementById("instructor").value;
-  const image = document.getElementById("image").value;
+class UI {
+  addCourseToList(course) {
+    const list = document.getElementById("course-list");
 
-  let course = new Course(title, instructor, image);
-  courseList.push(course);
-  handleChange(course);
-
-  event.preventDefault();
-});
-
-function handleChange(_course) {
-  let course = _course;
-  if (course.title == "" || course.instructor == "" || course.image == "") {
-    from_group.classList.forEach((item) => {
-      item.innerHTML += `<p style="color: red;font-size=12px;">Can not be empty</p>`;
-    });
+    var html = `
+        <tr>
+                <th>Image</th>
+                <th>Title</th>
+                <th>Instructor</th>
+                <th>
+                  <a href="#" class="btn btn-danger btn-sm delete">Delete</a>
+                </th>
+              </tr>
+    `;
+    list.innerHTML += html;
   }
-  course_list.innerHTML += `<tr>
-                <th>${course.image}</th>
-                <th>${course.title}</th>
-                <th>${course.instructor}</th>
-                <th></th>
-              </tr>`;
+
+  clearControls() {
+    const title = (document.getElementById("title").value = "");
+    const instructor = (document.getElementById("instructor").value = "");
+    const image = (document.getElementById("image").value = "");
+  }
+
+  deleteCourse(element) {
+    if (element.classList.contains("delete")) {
+      element.parentElement.parentElement.remove();
+    }
+  }
+
+  showAlert(message, className) {
+    var alert = `<div class="alert alert-${className}">
+  ${message}
+  </div>`;
+
+    const row = document.querySelector(".row");
+    //  beforeBegin, afterBegin, beforeEnd, afterEnd
+    row.insertAdjacentHTML("beforebegin", alert);
+
+    setTimeout(() => {
+      document.querySelector(".alert").remove();
+    }, 3000);
+  }
 }
+
+document
+  .getElementById("delete-all")
+  .addEventListener("click", function (event) {
+    const courseList = document.getElementById("course-list");
+
+    courseList.innerHTML = "";
+  });
+
+document
+  .getElementById("new-course")
+  .addEventListener("submit", function (event) {
+    const title = document.getElementById("title").value;
+    const instructor = document.getElementById("instructor").value;
+    const image = document.getElementById("image").value;
+
+    //    create course object
+    const course = new Course(title, instructor, image);
+
+    //    create UI
+    const ui = new UI();
+
+    if (title == "" || instructor == "" || image == "") {
+      ui.showAlert("Please complete the form", "warning");
+    } else {
+      //    add course to list
+      ui.addCourseToList(course);
+
+      //    clear controls
+      ui.clearControls();
+
+      ui.showAlert("The course has ben added", "success");
+    }
+
+    event.preventDefault();
+  });
+
+document
+  .getElementById("course-list")
+  .addEventListener("click", function (event) {
+    const ui = new UI();
+    ui.deleteCourse(event.target);
+    ui.showAlert("the course has been deleted", "danger");
+  });
