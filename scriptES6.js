@@ -3,6 +3,7 @@ class Course {
     this.title = title;
     this.instructor = instructor;
     this.image = image;
+    this.courseId = Math.floor(Math.random() * 1000000000);
   }
 }
 
@@ -12,11 +13,11 @@ class UI {
 
     var html = `
         <tr>
-                <th>Image</th>
-                <th>Title</th>
-                <th>Instructor</th>
+                <th>${course.image} </th>
+                <th>${course.title} </th>
+                <th>${course.instructor} </th>
                 <th>
-                  <a href="#" class="btn btn-danger btn-sm delete">Delete</a>
+                  <a href="#" data-id="${course.courseId}" class="btn btn-danger btn-sm delete">Delete</a>
                 </th>
               </tr>
     `;
@@ -32,6 +33,7 @@ class UI {
   deleteCourse(element) {
     if (element.classList.contains("delete")) {
       element.parentElement.parentElement.remove();
+      return true;
     }
   }
 
@@ -50,10 +52,57 @@ class UI {
   }
 }
 
+class Storage {
+  static getCourses() {
+    let courses;
+
+    if (localStorage.getItem("courses") === null) {
+      courses = [];
+    } else {
+      courses = JSON.parse(localStorage.getItem("courses"));
+    }
+
+    return courses;
+  }
+
+  static displayCourses() {
+    const courses = Storage.getCourses();
+
+    courses.forEach((course) => {
+      const ui = new UI();
+      ui.addCourseToList(course);
+    });
+  }
+
+  static addCourse(course) {
+    const courses = Storage.getCourses();
+    courses.push(course);
+    localStorage.setItem("courses", JSON.stringify(courses));
+  }
+
+  static deleteCourse(element) {
+    if (element.classList.contains("delete")) {
+      const id = element.getAttribute("data-id");
+      const courses = Storage.getCourses();
+
+      courses.forEach((course, index) => {
+        if (course.courseId == id) {
+          courses.splice(index, 1);
+        }
+      });
+
+      localStorage.setItem("courses", JSON.stringify(courses));
+    }
+  }
+}
+
+document.addEventListener("DOMContentLoaded", Storage.displayCourses);
+
 document
   .getElementById("delete-all")
   .addEventListener("click", function (event) {
     const courseList = document.getElementById("course-list");
+    localStorage.clear();
 
     courseList.innerHTML = "";
   });
@@ -77,6 +126,9 @@ document
       //    add course to list
       ui.addCourseToList(course);
 
+      //  save to local storage
+      Storage.addCourse(course);
+
       //    clear controls
       ui.clearControls();
 
@@ -90,6 +142,9 @@ document
   .getElementById("course-list")
   .addEventListener("click", function (event) {
     const ui = new UI();
-    ui.deleteCourse(event.target);
-    ui.showAlert("the course has been deleted", "danger");
+    if (ui.deleteCourse(event.target) == true) {
+      //    delete from storage
+      Storage.deleteCourse(event.target);
+      ui.showAlert("the course has been deleted", "danger");
+    }
   });
